@@ -1,0 +1,116 @@
+server:
+  port: 8081
+  
+spring:
+
+  # DB configurations
+  datasource:
+    url: jdbc:mysql://localhost:3306/UserServiceDB
+    username: root
+    password: Aayush@123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA configurations
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    
+  # Application name
+  application:
+    name: USER-SERVICE
+    
+  # Security configurations
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://dev-75123302.okta.com/oauth2/default
+          
+      # Client configurations
+      client:
+        registration:
+          # Can set any name we want to set
+          my-internal-client:
+            provider: okta
+            authorization-grant-type: client_credentials
+            scope: internal
+            client-id: 0oaarw6v7sp500BWI5d7
+            client-secret: VA55aIUJvh3TgaQp2uPzc9TMUAA2YvicxsVfz8uhbdgcglxAuooGoeJB4Mz-LfAr
+            
+        provider:
+          okta:
+            issuer-uri: https://dev-75123302.okta.com/oauth2/default
+          
+    
+    
+# Client configurations
+eureka:
+  instance:
+    prefer-ip-address: true
+  client: 
+    fetch-registry: true # By default true
+    register-with-eureka: true # By default true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+      
+# Circuitbreakers and health configurations
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+    
+  endpoints:
+    web:
+      exposure:
+        include: health
+        
+  endpoint:
+    health:
+      show-details: always # Default is never
+      
+# Resilience configurations
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingHotelBreaker:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        failure-rate-threshold: 50 # This is 50%
+        minimum-number-of-calls: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 6s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10 # Default 100
+        sliding-window-type: COUNT_BASED
+        
+  # Retry configurations   
+  retry:
+    instances:
+      ratingHotelBreaker:
+        max-attempts: 3
+        wait-duration: 5s
+        
+     
+  # Ratelimiter configurations   
+  ratelimiter:
+    instances:
+      userRateLimiter:
+        limit-refresh-period: 4s
+        limit-for-period: 2
+        timeout-duration: 0s
+        
+        
+# OKTA configurations
+okta:
+  oauth2:
+    issuer: https://dev-75123302.okta.com/oauth2/default
+    audience: api://default
+      
+      
+
+      
+      
+      
+      
+      
